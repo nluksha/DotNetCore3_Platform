@@ -30,11 +30,13 @@ namespace Platform
             {
                 if (contect.Request.Method == HttpMethods.Get && contect.Request.Query["custom"] == "true")
                 {
-                    await contect.Response.WriteAsync("Custom Middlewere\n");
+                    await contect.Response.WriteAsync("Custom Middlewere \n");
                 }
 
                 await next();
             });
+
+            app.UseMiddleware<QueryStringMiddleWare>();
 
             app.UseRouting();
 
