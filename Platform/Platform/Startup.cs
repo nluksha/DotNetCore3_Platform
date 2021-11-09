@@ -26,6 +26,16 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
+            app.Use(async (contect, next) =>
+            {
+                if (contect.Request.Method == HttpMethods.Get && contect.Request.Query["custom"] == "true")
+                {
+                    await contect.Response.WriteAsync("Custom Middlewere\n");
+                }
+
+                await next();
+            });
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
