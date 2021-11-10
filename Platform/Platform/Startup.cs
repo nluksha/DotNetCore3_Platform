@@ -31,6 +31,9 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<Population>();
+            app.UseMiddleware<Capital>();
+
             app.UseMiddleware<LocationMiddleware>();
 
             app.Map("/branch", branch =>
