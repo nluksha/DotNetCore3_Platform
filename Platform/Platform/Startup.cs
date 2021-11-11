@@ -34,57 +34,18 @@ namespace Platform
             app.UseMiddleware<Population>();
             app.UseMiddleware<Capital>();
 
-            app.UseMiddleware<LocationMiddleware>();
-
-            app.Map("/branch", branch =>
-            {
-                branch.UseMiddleware<QueryStringMiddleWare>();
-
-                branch.Run(async (context) =>
-                {
-                    await context.Response.WriteAsync("Branch Middleware");
-                });
-            });
-
-
-            app.Use(async (contect, next) =>
-            {
-                await next();
-                await contect.Response.WriteAsync($"\nStatus Code: { contect.Response.StatusCode}");
-            });
-
-            app.Use(async (contect, next) =>
-            {
-                if (contect.Request.Path == "/short")
-                {
-                    await contect.Response.WriteAsync("Request Short Circuied");
-                }
-                else
-                {
-                    await next();
-                }
-            });
-
-            app.Use(async (contect, next) =>
-            {
-                if (contect.Request.Method == HttpMethods.Get && contect.Request.Query["custom"] == "true")
-                {
-                    await contect.Response.WriteAsync("Custom Middlewere \n");
-                }
-
-                await next();
-            });
-
-            app.UseMiddleware<QueryStringMiddleWare>();
-
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
+                endpoints.MapGet("routing", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    await context.Response.WriteAsync("Request Was Routed");
                 });
+            });
+
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync("Terminal Middleware Reached");
             });
         }
     }
