@@ -31,16 +31,24 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<Population>();
-            app.UseMiddleware<Capital>();
+            // app.UseMiddleware<Population>();
+            // app.UseMiddleware<Capital>();
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("routing", async context =>
+                endpoints.MapGet("{first}/{second}/{third}", async contect =>
                 {
-                    await context.Response.WriteAsync("Request Was Routed");
+                    await contect.Response.WriteAsync("Request Was Routed \n");
+
+                    foreach (var kvp in contect.Request.RouteValues)
+                    {
+                        await contect.Response.WriteAsync($"{kvp.Key}: {kvp.Value} \n");
+                    }
                 });
+
+                endpoints.MapGet("capital/uk", new Capital().Invoke);
+                endpoints.MapGet("population/london", new Population().Invoke);
             });
 
             app.Use(async (context, next) =>
