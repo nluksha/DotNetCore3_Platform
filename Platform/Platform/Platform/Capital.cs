@@ -6,53 +6,33 @@ using Microsoft.AspNetCore.Http;
 
 namespace Platform
 {
-    public class Capital
+    public static class Capital
     {
-        private RequestDelegate next;
-
-        public Capital()
+        public static async Task Endpoint(HttpContext context)
         {
-        }
+            string capital = null;
+            string country = context.Request.RouteValues["country"] as string;
 
-        public Capital(RequestDelegate next)
-        {
-            this.next = next;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            var parts = context.Request.Path.ToString()
-                .Split("/", StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length == 2 && parts[0] == "capital")
+            switch ((country ?? "").ToLower())
             {
-                string capital = null;
-                string country = parts[1];
-
-                switch (country.ToLower())
-                {
-                    case "uk":
-                        capital = "London";
-                        break;
-                    case "paris":
-                        capital = "Paris";
-                        break;
-                    case "monaco":
-                        context.Response.Redirect($"/population/{country}");
-                        return;
-                }
-
-                if (capital != null)
-                {
-                    await context.Response.WriteAsync($"{capital} is the capital of {country}");
-
+                case "uk":
+                    capital = "London";
+                    break;
+                case "paris":
+                    capital = "Paris";
+                    break;
+                case "monaco":
+                    context.Response.Redirect($"/population/{country}");
                     return;
-                }
             }
 
-            if (next != null)
+            if (capital != null)
             {
-                await next(context);
+                await context.Response.WriteAsync($"{capital} is the capital of {country}");
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
             }
         }
     }

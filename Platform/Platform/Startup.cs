@@ -31,9 +31,6 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
-            // app.UseMiddleware<Population>();
-            // app.UseMiddleware<Capital>();
-
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
@@ -47,8 +44,8 @@ namespace Platform
                     }
                 });
 
-                endpoints.MapGet("capital/uk", new Capital().Invoke);
-                endpoints.MapGet("population/london", new Population().Invoke);
+                endpoints.MapGet("capital/{country}", Capital.Endpoint);
+                endpoints.MapGet("population/{city}", Population.Endpoint);
             });
 
             app.Use(async (context, next) =>
