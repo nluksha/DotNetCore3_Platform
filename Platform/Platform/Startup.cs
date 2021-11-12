@@ -35,7 +35,7 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("{first}/{second}/{third}", async contect =>
+                endpoints.MapGet("files/{filename}.{ext}", async contect =>
                 {
                     await contect.Response.WriteAsync("Request Was Routed \n");
 
@@ -45,7 +45,7 @@ namespace Platform
                     }
                 });
 
-                endpoints.MapGet("capital/{country}", Capital.Endpoint);
+                endpoints.MapGet("capital/{country=France}", Capital.Endpoint);
                 endpoints.MapGet("size/{city}", Population.Endpoint)
                     .WithMetadata(new RouteNameMetadata("population"));
             });

@@ -20,7 +20,7 @@ namespace Platform
                 case "uk":
                     capital = "London";
                     break;
-                case "paris":
+                case "france":
                     capital = "Paris";
                     break;
                 case "monaco":
