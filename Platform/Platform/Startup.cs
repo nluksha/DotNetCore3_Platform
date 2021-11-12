@@ -35,7 +35,7 @@ namespace Platform
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("files/{filename}.{ext}", async contect =>
+                endpoints.MapGet("{first}/{second}/{*catchhall}", async contect =>
                 {
                     await contect.Response.WriteAsync("Request Was Routed \n");
 
