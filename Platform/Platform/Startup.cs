@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 
 namespace Platform
 {
@@ -45,7 +46,8 @@ namespace Platform
                 });
 
                 endpoints.MapGet("capital/{country}", Capital.Endpoint);
-                endpoints.MapGet("population/{city}", Population.Endpoint);
+                endpoints.MapGet("size/{city}", Population.Endpoint)
+                    .WithMetadata(new RouteNameMetadata("population"));
             });
 
             app.Use(async (context, next) =>

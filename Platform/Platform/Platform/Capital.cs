@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Platform
 {
@@ -22,7 +24,10 @@ namespace Platform
                     capital = "Paris";
                     break;
                 case "monaco":
-                    context.Response.Redirect($"/population/{country}");
+                    var generator = context.RequestServices.GetService<LinkGenerator>();
+                    var url = generator.GetPathByRouteValues(context, "population", new { city = country });
+
+                    context.Response.Redirect(url);
                     return;
             }
 
