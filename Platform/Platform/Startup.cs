@@ -18,10 +18,10 @@ namespace Platform
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MessageOptions>(options =>
-           {
-               options.CityName = "Albany";
-           });
+            services.Configure<RouteOptions>(opts =>
+            {
+                opts.ConstraintMap.Add("countryName", typeof(CountryRouteConstraint));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,9 +45,14 @@ namespace Platform
                     }
                 });
 
-                endpoints.MapGet("capital/{country=France}", Capital.Endpoint);
+                endpoints.MapGet("capital/{country:countryName}", Capital.Endpoint);
                 endpoints.MapGet("size/{city?}", Population.Endpoint)
                     .WithMetadata(new RouteNameMetadata("population"));
+
+                endpoints.MapFallback(async context =>
+                {
+                    await context.Response.WriteAsync("Routed to fallback endpoint");
+                });
             });
 
             app.Use(async (context, next) =>
