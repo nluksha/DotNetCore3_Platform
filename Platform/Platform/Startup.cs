@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
+using Platform.Servises;
 
 namespace Platform
 {
@@ -18,10 +19,6 @@ namespace Platform
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<RouteOptions>(opts =>
-            {
-                opts.ConstraintMap.Add("countryName", typeof(CountryRouteConstraint));
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,31 +30,30 @@ namespace Platform
             }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("{first}/{second}/{*catchhall}", async contect =>
-                {
-                    await contect.Response.WriteAsync("Request Was Routed \n");
 
-                    foreach (var kvp in contect.Request.RouteValues)
-                    {
-                        await contect.Response.WriteAsync($"{kvp.Key}: {kvp.Value} \n");
-                    }
-                });
+            app.UseMiddleware<WeatherMiddleware>();
 
-                endpoints.MapGet("capital/{country:countryName}", Capital.Endpoint);
-                endpoints.MapGet("size/{city?}", Population.Endpoint)
-                    .WithMetadata(new RouteNameMetadata("population"));
-
-                endpoints.MapFallback(async context =>
-                {
-                    await context.Response.WriteAsync("Routed to fallback endpoint");
-                });
-            });
-
+            IResponseFormatter formatter = new TextResponseFormatter();
             app.Use(async (context, next) =>
             {
-                await context.Response.WriteAsync("Terminal Middleware Reached");
+                if (context.Request.Path == "/middleware/function")
+                {
+                    await formatter.Format(context, "Middleware Function: It is anowing in Chicago");
+                }
+                else
+                {
+                    await next();
+                }
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("endpoint/class", WeatherEndpoint.Endpoint);
+
+                endpoints.MapGet("endpoint/function", async contect =>
+                {
+                    await contect.Response.WriteAsync($"Endpoint Function: It is sunny in LA");
+                });
             });
         }
     }
