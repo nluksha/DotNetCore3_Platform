@@ -48,7 +48,7 @@ namespace Platform
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapWeather("/endpoint/class");
+                endpoints.MapEndpoint<WeatherEndpoint>("/endpoint/class");
 
                 endpoints.MapGet("/endpoint/function", async context =>
                 {

@@ -11,7 +11,14 @@ namespace Platform
 {
     public class WeatherEndpoint
     {
-        public static async Task Endpoint(HttpContext context, IResponseFormatter formatter)
+        private IResponseFormatter formatter;
+
+        public WeatherEndpoint(IResponseFormatter formatter)
+        {
+            this.formatter = formatter;
+        }
+
+        public async Task Endpoint(HttpContext context)
         {
             await formatter.Format(context, "Middleware Class: It is  cloudy in Milan");
         }
