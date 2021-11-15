@@ -33,12 +33,12 @@ namespace Platform
 
             app.UseMiddleware<WeatherMiddleware>();
 
-            IResponseFormatter formatter = new TextResponseFormatter();
+            //IResponseFormatter formatter = new TextResponseFormatter();
             app.Use(async (context, next) =>
             {
                 if (context.Request.Path == "/middleware/function")
                 {
-                    await formatter.Format(context, "Middleware Function: It is anowing in Chicago");
+                    await TypeBroker.Formatter.Format(context, "Middleware Function: It is anowing in Chicago");
                 }
                 else
                 {
@@ -50,9 +50,9 @@ namespace Platform
             {
                 endpoints.MapGet("endpoint/class", WeatherEndpoint.Endpoint);
 
-                endpoints.MapGet("endpoint/function", async contect =>
+                endpoints.MapGet("endpoint/function", async context =>
                 {
-                    await contect.Response.WriteAsync($"Endpoint Function: It is sunny in LA");
+                    await TypeBroker.Formatter.Format(context, $"Endpoint Function: It is sunny in LA");
                 });
             });
         }
