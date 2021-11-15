@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -22,7 +23,12 @@ namespace Microsoft.AspNetCore.Builder
 
             T endpointInstance = ActivatorUtilities.CreateInstance<T>(app.ServiceProvider);
 
-            app.MapGet(path, (RequestDelegate)methodInfo.CreateDelegate(typeof(RequestDelegate), endpointInstance));
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
+            app.MapGet(path, context => (Task)methodInfo.Invoke(
+                endpointInstance,
+                methodParams.Select(p => p.ParameterType == typeof(HttpContext) ? context : app.ServiceProvider.GetService(p.ParameterType)).ToArray()
+                ));
+
         }
     }
 }
