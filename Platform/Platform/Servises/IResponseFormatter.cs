@@ -9,5 +9,7 @@ namespace Platform.Servises
     public interface IResponseFormatter
     {
         Task Format(HttpContext context, string content);
+
+        bool RichOutput => false;
     }
 }

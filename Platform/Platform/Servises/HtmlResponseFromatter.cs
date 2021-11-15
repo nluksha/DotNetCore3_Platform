@@ -23,5 +23,7 @@ namespace Platform.Servises
                 </html>
             ");
         }
+
+        public bool RichOutput => true;
     }
 }
