@@ -19,10 +19,11 @@ namespace Platform
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IResponseFormatter, HtmlResponseFromatter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IResponseFormatter formatter)
         {
             if (env.IsDevelopment())
             {
@@ -33,12 +34,11 @@ namespace Platform
 
             app.UseMiddleware<WeatherMiddleware>();
 
-            //IResponseFormatter formatter = new TextResponseFormatter();
             app.Use(async (context, next) =>
             {
                 if (context.Request.Path == "/middleware/function")
                 {
-                    await TypeBroker.Formatter.Format(context, "Middleware Function: It is anowing in Chicago");
+                    await formatter.Format(context, "Middleware Function: It is anowing in Chicago");
                 }
                 else
                 {
@@ -48,11 +48,11 @@ namespace Platform
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("endpoint/class", WeatherEndpoint.Endpoint);
+                endpoints.MapWeather("/endpoint/class");
 
-                endpoints.MapGet("endpoint/function", async context =>
+                endpoints.MapGet("/endpoint/function", async context =>
                 {
-                    await TypeBroker.Formatter.Format(context, $"Endpoint Function: It is sunny in LA");
+                    await formatter.Format(context, $"Endpoint Function: It is sunny in LA");
                 });
             });
         }
