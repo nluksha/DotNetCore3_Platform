@@ -13,17 +13,19 @@ namespace Platform
         private RequestDelegate next;
         // private IResponseFormatter formatter;
 
-        public WeatherMiddleware(RequestDelegate nextDelegate, IResponseFormatter formatter)
+        public WeatherMiddleware(RequestDelegate nextDelegate)
         {
             next = nextDelegate;
             // this.formatter = formatter;
         }
 
-        public async Task Invoke(HttpContext context, IResponseFormatter formatter)
+        public async Task Invoke(HttpContext context, IResponseFormatter formatter1, IResponseFormatter formatter2, IResponseFormatter formatter3)
         {
             if (context.Request.Path == "/middleware/class")
             {
-                await formatter.Format(context, "Middleware Class: It is  raining in London");
+                await formatter1.Format(context, String.Empty);
+                await formatter2.Format(context, String.Empty);
+                await formatter3.Format(context, String.Empty);
             } else
             {
                 await next(context);
