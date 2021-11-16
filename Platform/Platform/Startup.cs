@@ -33,7 +33,11 @@ namespace Platform
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseRouting();
 
             app.UseMiddleware<LocationMiddleware>();
@@ -47,6 +51,11 @@ namespace Platform
 
                     string environ = Configuration["ASPNETCORE_ENVIRONMENT"];
                     await context.Response.WriteAsync($"\nThe env setting is: {environ}");
+
+                    string wsId = Configuration["WebService:Id"];
+                    string wsKey = Configuration["WebService:Key"];
+                    await context.Response.WriteAsync($"\nThe env secret Id is: {wsId}");
+                    await context.Response.WriteAsync($"\nThe env secret Key is: {wsKey}");
                 }
                 else
                 {
