@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Platform.Servises;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.FileProviders;
 
 namespace Platform
 {
@@ -38,6 +39,14 @@ namespace Platform
             {
                 app.UseDeveloperExceptionPage();
             }
+
+
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider($"{env.ContentRootPath}/staticfiles"),
+                RequestPath = "/files"
+            });
 
             app.UseRouting();
 
