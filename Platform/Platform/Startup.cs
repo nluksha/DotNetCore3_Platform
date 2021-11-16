@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Platform.Servises;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Platform
 {
@@ -31,7 +32,7 @@ namespace Platform
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -67,7 +68,9 @@ namespace Platform
             {
                 endpoints.MapGet("/", async context =>
                 {
+                    logger.LogDebug("Response for / started");
                     await context.Response.WriteAsync("Hello  World!");
+                    logger.LogDebug("Response for / completed");
                 });
 
             });
