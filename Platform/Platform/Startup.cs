@@ -62,14 +62,27 @@ namespace Platform
             {
                 app.UseHsts();
             }
-
             app.UseExceptionHandler("/error.html");
 
+
             app.UseHttpsRedirection();
+            app.UseStatusCodePages("text/html", ResponseString.DefaultResponse);
             app.UseCookiePolicy();
             app.UseStaticFiles();
             app.UseMiddleware<ConsentMiddleware>();
             app.UseSession();
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path == "/error")
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Task.CompletedTask;
+                }
+                else
+                {
+                    await next();
+                }
+            });
 
             app.Run(context => {
                 throw new Exception("My error 1");
