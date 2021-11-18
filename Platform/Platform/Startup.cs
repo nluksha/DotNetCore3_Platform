@@ -33,6 +33,14 @@ namespace Platform
             services.Configure<CookiePolicyOptions>(opts => {
                 opts.CheckConsentNeeded = context => true;
             });
+
+            //sessions
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +53,7 @@ namespace Platform
 
             app.UseCookiePolicy();
             app.UseMiddleware<ConsentMiddleware>();
+            app.UseSession();
 
             //app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions
@@ -80,6 +89,18 @@ namespace Platform
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/session", async context =>
+                {
+                    int counter1 = (context.Session.GetInt32("counter1") ?? 0) + 1;
+                    int counter2 = (context.Session.GetInt32("counter2") ?? 0) + 1;
+
+                    context.Session.SetInt32("counter1", counter1);
+                    context.Session.SetInt32("counter2", counter2);
+                    await context.Session.CommitAsync();
+
+                    await context.Response.WriteAsync($"Session Counter1: {counter1},\n Session Counter2: {counter2}");
+                });
+
                 endpoints.MapGet("/cookie", async context =>
                 {
                     int counter1 = int.Parse(context.Request.Cookies["counter1"] ?? "0") + 1;
