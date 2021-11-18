@@ -51,6 +51,7 @@ namespace Platform
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseMiddleware<ConsentMiddleware>();
             app.UseSession();
@@ -63,6 +64,12 @@ namespace Platform
             });
 
             app.UseRouting();
+
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync($"HTTPS Request: {context.Request.IsHttps} \n");
+                await next();
+            });
 
             app.UseMiddleware<LocationMiddleware>();
 
