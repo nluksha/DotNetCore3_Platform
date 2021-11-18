@@ -56,24 +56,23 @@ namespace Platform
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                // app.UseDeveloperExceptionPage();
             }
-
-            if (env.IsProduction())
+            else
             {
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler("/error.html");
+
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
+            app.UseStaticFiles();
             app.UseMiddleware<ConsentMiddleware>();
             app.UseSession();
 
-            //app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider($"{env.ContentRootPath}/staticfiles"),
-                RequestPath = "/files"
+            app.Run(context => {
+                throw new Exception("My error 1");
             });
 
             app.UseRouting();
@@ -149,6 +148,11 @@ namespace Platform
                     logger.LogDebug("Response for / started");
                     await context.Response.WriteAsync("Hello  World!");
                     logger.LogDebug("Response for / completed");
+                });
+
+                endpoints.MapGet("/test", context =>
+                {
+                    throw new Exception("My Error");
                 });
 
                 endpoints.MapFallback(async context =>
