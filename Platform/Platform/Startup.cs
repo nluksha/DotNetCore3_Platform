@@ -13,8 +13,6 @@ using Platform.Servises;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 namespace Platform
 {
@@ -36,11 +34,15 @@ namespace Platform
                 opts.CheckConsentNeeded = context => true;
             });
 
+            //cache
             services.AddDistributedSqlServerCache(opts => {
                 opts.ConnectionString = Configuration.GetConnectionString("CacheConnection");
                 opts.SchemaName = "dbo";
                 opts.TableName = "DataCache";
             });
+
+            services.AddResponseCaching();
+            services.AddSingleton<IResponseFormatter, HtmlResponseFromatter>();
 
             //sessions
             services.AddSession(options =>
@@ -57,8 +59,9 @@ namespace Platform
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseExceptionHandler("/error.html");
 
+            app.UseResponseCaching();
+            app.UseExceptionHandler("/error.html");
             app.UseStatusCodePages("text/html", ResponseString.DefaultResponse);
             app.UseCookiePolicy();
             app.UseStaticFiles();
