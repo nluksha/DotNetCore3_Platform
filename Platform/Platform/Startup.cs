@@ -36,8 +36,11 @@ namespace Platform
                 opts.CheckConsentNeeded = context => true;
             });
 
+            services.AddDistributedMemoryCache(opts => {
+                opts.SizeLimit = 200;
+            });
+
             //sessions
-            services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -120,6 +123,8 @@ namespace Platform
                     context.Response.Redirect("/");
                     return Task.CompletedTask;
                 });
+
+                endpoints.MapEndpoint<SumEndpoint>("/sum/{count:int=1000000000}");
 
                 endpoints.MapGet("/", async context =>
                 {
