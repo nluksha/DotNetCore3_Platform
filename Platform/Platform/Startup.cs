@@ -36,8 +36,10 @@ namespace Platform
                 opts.CheckConsentNeeded = context => true;
             });
 
-            services.AddDistributedMemoryCache(opts => {
-                opts.SizeLimit = 200;
+            services.AddDistributedSqlServerCache(opts => {
+                opts.ConnectionString = Configuration.GetConnectionString("CacheConnection");
+                opts.SchemaName = "dbo";
+                opts.TableName = "DataCache";
             });
 
             //sessions
