@@ -13,6 +13,8 @@ using Platform.Servises;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.EntityFrameworkCore;
+using Platform.Models;
 
 namespace Platform
 {
@@ -50,10 +52,17 @@ namespace Platform
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
             });
+
+            services.AddDbContext<CalculationContext>(opts =>
+            {
+                opts.UseSqlServer(Configuration.GetConnectionString("CalcConnection"));
+            });
+
+            services.AddTransient<SeedData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IHostApplicationLifetime lifetime, SeedData seedData)
         {
             if (env.IsDevelopment())
             {
@@ -145,6 +154,16 @@ namespace Platform
                 });
                 */
             });
+
+            bool cmdLineInit = (Configuration["INITDB"] ?? "false") == "true";
+            if (env.IsDevelopment() || cmdLineInit)
+            {
+                seedData.SeedDatabase();
+                if (cmdLineInit)
+                {
+                    lifetime.StopApplication();
+                }
+            }
         }
     }
 }
