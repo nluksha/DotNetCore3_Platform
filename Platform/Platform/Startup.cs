@@ -43,12 +43,6 @@ namespace Platform
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
             });
-
-            services.AddHsts(opts =>
-            {
-                opts.MaxAge = TimeSpan.FromDays(1);
-                opts.IncludeSubDomains = true;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,45 +50,16 @@ namespace Platform
         {
             if (env.IsDevelopment())
             {
-                // app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
+                app.UseDeveloperExceptionPage();
             }
             app.UseExceptionHandler("/error.html");
 
-
-            app.UseHttpsRedirection();
             app.UseStatusCodePages("text/html", ResponseString.DefaultResponse);
             app.UseCookiePolicy();
             app.UseStaticFiles();
             app.UseMiddleware<ConsentMiddleware>();
             app.UseSession();
-            app.Use(async (context, next) =>
-            {
-                if (context.Request.Path == "/error")
-                {
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    await Task.CompletedTask;
-                }
-                else
-                {
-                    await next();
-                }
-            });
-
-            app.Run(context => {
-                throw new Exception("My error 1");
-            });
-
             app.UseRouting();
-
-            app.Use(async (context, next) =>
-            {
-                await context.Response.WriteAsync($"HTTPS Request: {context.Request.IsHttps} \n");
-                await next();
-            });
 
             app.UseMiddleware<LocationMiddleware>();
 
@@ -163,15 +128,12 @@ namespace Platform
                     logger.LogDebug("Response for / completed");
                 });
 
-                endpoints.MapGet("/test", context =>
-                {
-                    throw new Exception("My Error");
-                });
-
+                /*
                 endpoints.MapFallback(async context =>
                 {
-                    await context.Response.WriteAsync("Hello  World...");
+                    await context.Response.WriteAsync("404 ...");
                 });
+                */
             });
         }
     }
